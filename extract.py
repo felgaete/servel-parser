@@ -15,9 +15,9 @@ import java.awt.geom.Rectangle2D.Float as r2df
 
 MAX_ROWS_PER_PAGE = 65
 START_Y = 62
-TEXT_HEIGHT = 4.6690006
-EVEN_OFFSET = 3.3230094
-ODD_OFFSET = 3.3229994
+TEXT_HEIGHT = 8
+EVEN_OFFSET = 0
+ODD_OFFSET = 0
 
 
 def get_pdf_document(name):
@@ -45,11 +45,11 @@ def get_province_and_area(document):
 def get_row(page, offset):
     stripper = PDFTextStripperByArea()
 
-    stripper.addRegion("name", r2df(23.965, START_Y + offset, 261.576, TEXT_HEIGHT))
-    stripper.addRegion("nin", r2df(285.541, START_Y + offset, 55.512, TEXT_HEIGHT))
-    stripper.addRegion("sex", r2df(341.053, START_Y + offset, 16.006, TEXT_HEIGHT))
-    stripper.addRegion("address", r2df(380.581, START_Y + offset, 210.96, TEXT_HEIGHT))
-    stripper.addRegion("circumscription", r2df(591.541, START_Y + offset, 200.232, TEXT_HEIGHT))
+    stripper.addRegion("name", r2df(23, START_Y + offset, 224, TEXT_HEIGHT))
+    stripper.addRegion("nin", r2df(295, START_Y + offset, 45, TEXT_HEIGHT))
+    stripper.addRegion("sex", r2df(340, START_Y + offset, 18, TEXT_HEIGHT))
+    stripper.addRegion("address", r2df(380, START_Y + offset, 210, TEXT_HEIGHT))
+    stripper.addRegion("circumscription", r2df(591, START_Y + offset, 195, TEXT_HEIGHT))
     stripper.addRegion("place", r2df(790, START_Y + offset, 26, TEXT_HEIGHT))
 
     stripper.extractRegions(page)
