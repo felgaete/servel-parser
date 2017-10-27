@@ -14,7 +14,7 @@ import org.apache.pdfbox.text.PDFTextStripperByArea as PDFTextStripperByArea
 import java.awt.geom.Rectangle2D.Float as r2df
 
 MAX_ROWS_PER_PAGE = 65
-START_Y = 66.204
+START_Y = 62
 TEXT_HEIGHT = 4.6690006
 EVEN_OFFSET = 3.3230094
 ODD_OFFSET = 3.3229994
@@ -50,7 +50,7 @@ def get_row(page, offset):
     stripper.addRegion("sex", r2df(341.053, START_Y + offset, 16.006, TEXT_HEIGHT))
     stripper.addRegion("address", r2df(380.581, START_Y + offset, 210.96, TEXT_HEIGHT))
     stripper.addRegion("circumscription", r2df(591.541, START_Y + offset, 200.232, TEXT_HEIGHT))
-    stripper.addRegion("place", r2df(791.773, START_Y + offset, 17.334, TEXT_HEIGHT))
+    stripper.addRegion("place", r2df(790, START_Y + offset, 26, TEXT_HEIGHT))
 
     stripper.extractRegions(page)
 
