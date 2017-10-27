@@ -134,53 +134,72 @@ def results_to_csv(filename, records, delimiter):
             writer.writerow([row["name"].encode("utf-8"), row["nin"], row["sex"], row["address"].encode("utf-8"),
                              row["circumscription"].encode("utf-8"), row["place"]])
 
-
-def main(args):
-    document = get_pdf_document(args.file)
+def parse_pdf_document(file, start_page, end_page, output, delimiter):
+    document = get_pdf_document(file)
     max_pages = document.getNumberOfPages()
 
-    if args.count:
-        print("This PDF has {0} pages".format(max_pages))
-        return
-
-    start_page = args.start - 1 if args.start and args.start >= 0 else 0
-    end_page = args.end if args.end and args.end <= max_pages else max_pages
+    if not start_page or start_page < 0:
+        start_page = 0
+    else:
+        start_page -= 1
+    if not end_page or end_page > max_pages :
+        end_page = max_pages
+    if not delimiter:
+        delimiter = ','
 
     province_and_area = get_province_and_area(document)
 
-    filename = "{}-{}-{}".format(
+    filename = u"{}-{}-{}".format(
         province_and_area["region"], province_and_area["province"], province_and_area["area"]
     ) if all(k in province_and_area for k in ("region", "province", "area")) else None
     if filename is None:
         filename = get_filename_from_path(args.file)
-
     filename = safe_filename(filename)
-
     for i in range(start_page, end_page):
         records = get_records_from_page(document, i)
 
-        if args.output == "cli":
+        if output == "cli":
             results_to_cli(records)
-        elif args.output == "csv":
-            delimiter = args.delimiter if args.delimiter else ','
+        elif output == "csv":
             results_to_csv(filename, records, delimiter)
+
+    document.close()
+
+def main(args):
+
+    if not(args.file or args.dir):
+        print "You must supply either a --file or --dir arg"
+        return
+
+    if args.file:
+        parse_pdf_document(args.file, args.start, args.end, args.output, args.delimiter)
+        return
+
+    if args.dir:
+        for _, _, files in os.walk(args.dir):
+            for f in files:
+                filename, fileext = os.path.splitext(f)
+                if fileext == ".pdf":
+                    print u"Parsing file {}".format(f)
+                    parse_pdf_document(f, args.start, args.end, args.output, args.delimiter)
+            return
 
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("file", type=str,
+    parser.add_argument("--file", type=str,
                         help="path to pdf file")
     parser.add_argument("--start", type=int,
                         help="Start from page")
     parser.add_argument("--end", type=int,
                         help="Until to page")
-    parser.add_argument("--count", action='store_true',
-                        help="Get numbers of pages")
     parser.add_argument("--output", type=str, choices=["csv", "cli"], default="cli",
                         help="Get numbers of pages")
     parser.add_argument('--delimiter', type=str,
                         help="Set csv delimiter")
+    parser.add_argument('--dir', type=str, nargs='?', const='.',
+                        help="Parse all files in a directory")
     args = parser.parse_args()
 
     main(args)
