@@ -28,8 +28,9 @@ def get_pdf_document(name):
 
 def get_province_and_area(document):
     stripper = PDFTextStripperByArea()
-    stripper.addRegion("area", r2df(483.397, 28.007, 255.456, 4.760))
-    stripper.addRegion("province", r2df(190.717, 40.247, 28.445, 4.760))
+    stripper.addRegion("region", r2df(190, 23, 150, 6))
+    stripper.addRegion("area", r2df(483, 23, 150, 6))
+    stripper.addRegion("province", r2df(190, 35, 150, 6))
 
     page = document.getPage(0)
     stripper.extractRegions(page)
@@ -125,9 +126,9 @@ def results_to_cli(results):
                                                  row["circumscription"], row["place"])
 
 
-def results_to_csv(filename, records):
+def results_to_csv(filename, records, delimiter):
     with open("{}.csv".format(filename), 'ab') as csv_file:
-        writer = csv.writer(csv_file, delimiter=',')
+        writer = csv.writer(csv_file, delimiter=delimiter)
         for row in records:
             row = normalize_row(row)
             writer.writerow([row["name"].encode("utf-8"), row["nin"], row["sex"], row["address"].encode("utf-8"),
@@ -147,7 +148,9 @@ def main(args):
 
     province_and_area = get_province_and_area(document)
 
-    filename = province_and_area["province"] if "province" in province_and_area else None
+    filename = "{}-{}-{}".format(
+        province_and_area["region"], province_and_area["province"], province_and_area["area"]
+    ) if all(k in province_and_area for k in ("region", "province", "area")) else None
     if filename is None:
         filename = get_filename_from_path(args.file)
 
@@ -159,7 +162,8 @@ def main(args):
         if args.output == "cli":
             results_to_cli(records)
         elif args.output == "csv":
-            results_to_csv(filename, records)
+            delimiter = args.delimiter if args.delimiter else ','
+            results_to_csv(filename, records, delimiter)
 
 
 if __name__ == "__main__":
@@ -175,7 +179,8 @@ if __name__ == "__main__":
                         help="Get numbers of pages")
     parser.add_argument("--output", type=str, choices=["csv", "cli"], default="cli",
                         help="Get numbers of pages")
+    parser.add_argument('--delimiter', type=str,
+                        help="Set csv delimiter")
     args = parser.parse_args()
 
     main(args)
-
